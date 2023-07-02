@@ -1,67 +1,75 @@
+
 import "./globals.css";
 import Image from "next/image";
-import styles from "./page.module.css";
 import PluginCard from "./components/plugin-card";
+import { generateContrastingColors } from "./utils/colors";
+import Filters from "./components/filter";
 
-const SignInButton = () => (
-  <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded">
-    Sign in with Google
-  </button>
-);
+async function getCategories() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_PUBLIC_URL}/api/category`);
+  // Recommendation: handle errors
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error("Failed to fetch data");
+  }
 
-// A component for the filter section
-const Filters = () => (
-  <div className="navbar bg-inherit px-2 pb-0 border-b-2 border-b-base-200 rounded-b-none md:rounded-lg md:rounded-b-none overflow-x-auto whitespace-nowrap">
-    <button className="mx-2 bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded">
-      All
-    </button>
-    <button className="mx-2 bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded">
-      Need feedback
-    </button>
-    <button className="mx-2 bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded">
-      Next
-    </button>
-    <button className="mx-2 bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded">
-      In Progress
-    </button>
-    <button className="mx-2 bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded">
-      Complete
-    </button>
-    <button className="mx-2 bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded">
-      Most Voted
-    </button>
-    <button className="mx-2 bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded">
-      Most Recent
-    </button>
-  </div>
-);
+  return res.json();
+}
 
-// A component for a single task
-const Task = ({ status, description, votes }) => <PluginCard />;
+async function getPlugins() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_PUBLIC_URL}/api/plugin`);
+  // Recommendation: handle errors
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error("Failed to fetch data");
+  }
 
-// A component for the list of tasks
-const TaskList = ({ tasks }) => (
-  <div className="flex flex-wrap">
-    {tasks.map((task, index) => (
-      <Task key={index} {...task} />
+  return res.json();
+}
+
+// A component for the list of plugins
+const PluginList = ({ plugins }) => (
+  <div className="flex flex-wrap bg-white dark:bg-slate-800">
+    {plugins.map((plugin, index) => (
+      <PluginCard key={index} id={plugin.id} logoUrl={plugin.metadata.logo_url} url={plugin.metadata.domain} name={plugin.metadata.name} description={plugin.metadata.description} category={plugin.metadata.category} color={plugin.color}/>
     ))}
   </div>
 );
 
 export default async function Home() {
-  // console.log(categories);
+  const plugins = await getPlugins();
+  const categories = await getCategories();
 
-  const tasks = [{ status: "good", description: "dafsd", votes: 12 }];
+  const colors = generateContrastingColors(categories.length)
+  const categoryColorMap = {}
+
+  const newCategories = categories.map((category, index) => {
+    const categoryName = category['category-name'].toUpperCase()
+    categoryColorMap[categoryName] = colors[index]
+    return {
+      ...category,
+      color: colors[index]
+    }
+  })
+
+  const newPlugins = plugins.map((plugin, index) => {
+    const categoryName = plugin.metadata.category.toUpperCase()
+    return {
+      ...plugin,
+      color: categoryColorMap[categoryName]
+    }
+  })
+
   return (
     <div className="max-w-screen-md md:mx-auto md:pt-10">
-      <div className="navbar bg-base-100 shadow-md px-2 md:mb-3 md:rounded-lg">
+      <div className="navbar bg-white shadow-md px-2 md:mb-3 md:rounded-lg dark:bg-slate-800">
         <div className="flex flex-col justify-start select-none rounded-lg px-4 py-2">
           <span className="text-2xl font-bold">Rate my Plugins</span>
-          <span className="text-xs">or find a plugin</span>
+          <span className="text-xs">Until OpenAI Plugin Store is ready</span>
         </div>
       </div>
-      <Filters />
-      <TaskList tasks={tasks} />
+      <Filters categories={newCategories} />
+      <PluginList plugins={newPlugins} />
     </div>
-  )
+  );
 }
