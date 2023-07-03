@@ -1,11 +1,16 @@
-// import { useCategory } from "../_context/category-context";
+'use client';
+import { useCategory } from "../_context/category-context";
 
 const PluginCard = ({ id, logoUrl, url, name, description, category, color }) => {
-  // const [selectedCategory] = useCategory();
+  const [selectedCategory, setSelectedCategory] = useCategory();
 
-  // if (selectedCategory && selectedCategory !== category) {
-  //   return <></>;
-  // }
+  if (selectedCategory) {
+    const selectedCategoryName = selectedCategory["category-name"].toUpperCase();
+    const categoryName = category.toUpperCase();
+    if(selectedCategoryName !== categoryName) {
+      return <></>;
+    }
+  }
 
   const Option = ({ dataTip, svgPath, idSuffix }) => (
     <div className="tooltip tooltip-right" data-tip={dataTip}>

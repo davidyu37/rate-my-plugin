@@ -3,12 +3,10 @@
 import { useCategory } from '../_context/category-context';
 
 const CategoryButton = ({ category }) => {
-  const [setSelectedCategory] = useCategory();
-
-  console.log(setSelectedCategory)
+  const [selectedCategory, setSelectedCategory] = useCategory();
 
   const handleClick = () => {
-    // setSelectedCategory(category);
+    setSelectedCategory(category);
   };
 
   return (
