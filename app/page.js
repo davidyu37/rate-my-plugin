@@ -37,20 +37,20 @@ const PluginList = ({ plugins }) => (
 );
 
 export default async function Home() {
-  const plugins = await getPlugins();
-  const categories = await getCategories();
+  // const plugins = await getPlugins();
+  // const categories = await getCategories();
 
-  const colors = generateContrastingColors(categories.length)
-  const categoryColorMap = {}
+  // const colors = generateContrastingColors(categories.length)
+  // const categoryColorMap = {}
 
-  const newCategories = categories.map((category, index) => {
-    const categoryName = category['category-name'].toUpperCase()
-    categoryColorMap[categoryName] = colors[index]
-    return {
-      ...category,
-      color: colors[index]
-    }
-  })
+  // const newCategories = categories.map((category, index) => {
+  //   const categoryName = category['category-name'].toUpperCase()
+  //   categoryColorMap[categoryName] = colors[index]
+  //   return {
+  //     ...category,
+  //     color: colors[index]
+  //   }
+  // })
 
   const newPlugins = plugins.map((plugin, index) => {
     const categoryName = plugin.metadata.category.toUpperCase()
@@ -68,8 +68,8 @@ export default async function Home() {
           <span className="text-xs">Until OpenAI Plugin Store is ready</span>
         </div>
       </div>
-      <Filters categories={newCategories} />
-      <PluginList plugins={newPlugins} />
+      {/* <Filters categories={newCategories} />
+      <PluginList plugins={newPlugins} /> */}
     </div>
   );
 }
