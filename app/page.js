@@ -1,9 +1,9 @@
 
 import "./globals.css";
 import Image from "next/image";
-import PluginCard from "./components/plugin-card";
-import { generateContrastingColors } from "./utils/colors";
-import Filters from "./components/filter";
+import PluginCard from "./_components/plugin-card";
+import { generateContrastingColors } from "../utils/colors";
+import Filters from "./_components/filter";
 
 async function getCategories() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_PUBLIC_URL}/api/category`);
@@ -37,28 +37,27 @@ const PluginList = ({ plugins }) => (
 );
 
 export default async function Home() {
-  // const plugins = await getPlugins();
-  // const categories = await getCategories();
+  const [plugins, categories] = await Promise.all([getPlugins(), getCategories()])
 
-  // const colors = generateContrastingColors(categories.length)
-  // const categoryColorMap = {}
+  const colors = generateContrastingColors(categories.length)
+  const categoryColorMap = {}
 
-  // const newCategories = categories.map((category, index) => {
-  //   const categoryName = category['category-name'].toUpperCase()
-  //   categoryColorMap[categoryName] = colors[index]
-  //   return {
-  //     ...category,
-  //     color: colors[index]
-  //   }
-  // })
+  const newCategories = categories.map((category, index) => {
+    const categoryName = category['category-name'].toUpperCase()
+    categoryColorMap[categoryName] = colors[index]
+    return {
+      ...category,
+      color: colors[index]
+    }
+  })
 
-  // const newPlugins = plugins.map((plugin, index) => {
-  //   const categoryName = plugin.metadata.category.toUpperCase()
-  //   return {
-  //     ...plugin,
-  //     color: categoryColorMap[categoryName]
-  //   }
-  // })
+  const newPlugins = plugins.map((plugin, index) => {
+    const categoryName = plugin.metadata.category.toUpperCase()
+    return {
+      ...plugin,
+      color: categoryColorMap[categoryName]
+    }
+  })
 
   return (
     <div className="max-w-screen-md md:mx-auto md:pt-10">
@@ -68,8 +67,8 @@ export default async function Home() {
           <span className="text-xs">Until OpenAI Plugin Store is ready</span>
         </div>
       </div>
-      {/* <Filters categories={newCategories} />
-      <PluginList plugins={newPlugins} /> */}
+      <Filters categories={newCategories} />
+      <PluginList plugins={newPlugins} />
     </div>
   );
 }

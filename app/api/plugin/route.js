@@ -1,5 +1,5 @@
 // pages/api/categories.js
-import db from "../../utils/firebaseAdmin";
+import db from "../../../utils/firebaseAdmin";
 
 export async function GET(request) {
   try {
