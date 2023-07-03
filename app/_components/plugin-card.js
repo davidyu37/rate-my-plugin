@@ -1,4 +1,12 @@
+// import { useCategory } from "../_context/category-context";
+
 const PluginCard = ({ id, logoUrl, url, name, description, category, color }) => {
+  // const [selectedCategory] = useCategory();
+
+  // if (selectedCategory && selectedCategory !== category) {
+  //   return <></>;
+  // }
+
   const Option = ({ dataTip, svgPath, idSuffix }) => (
     <div className="tooltip tooltip-right" data-tip={dataTip}>
       <li className="rounded-lg">
