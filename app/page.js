@@ -52,13 +52,13 @@ export default async function Home() {
   //   }
   // })
 
-  const newPlugins = plugins.map((plugin, index) => {
-    const categoryName = plugin.metadata.category.toUpperCase()
-    return {
-      ...plugin,
-      color: categoryColorMap[categoryName]
-    }
-  })
+  // const newPlugins = plugins.map((plugin, index) => {
+  //   const categoryName = plugin.metadata.category.toUpperCase()
+  //   return {
+  //     ...plugin,
+  //     color: categoryColorMap[categoryName]
+  //   }
+  // })
 
   return (
     <div className="max-w-screen-md md:mx-auto md:pt-10">
