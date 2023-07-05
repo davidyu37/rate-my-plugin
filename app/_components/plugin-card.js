@@ -2,6 +2,7 @@
 import { useCategory } from "../_context/category-context";
 import { getUrl } from "../../utils/url";
 import ImageWithFallback from "./image-fallback";
+import useSWR, { useSWRConfig } from 'swr'
 
 const PluginCard = ({
   id,
@@ -13,6 +14,7 @@ const PluginCard = ({
   color,
   rating,
 }) => {
+  const { mutate } = useSWRConfig()
   const [selectedCategory, setSelectedCategory] = useCategory();
 
   async function postData(url = "", data = {}) {
@@ -37,6 +39,10 @@ const PluginCard = ({
     }
   }
 
+  const updateFn = (newPluginList) => {
+    // console.log(newPluginList)
+  }
+
   const handleClick = async (vote) => {
     const data = JSON.stringify({
       pluginId: id,
@@ -47,7 +53,16 @@ const PluginCard = ({
     const url = `${getUrl()}/api/rating`;
     const result = await postData(url, data);
 
+    // TODO: can do optimistic update if needed
+    const newPluginList = []
+
+    const options = {
+      optimisticData: newPluginList,
+      rollbackOnError: true,
+    }
+
     // TODO: update the UI to reflect the vote
+    mutate('/api/plugin', updateFn(newPluginList), options)
   };
 
   if (selectedCategory) {
