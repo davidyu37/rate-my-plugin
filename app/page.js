@@ -17,23 +17,12 @@ async function getCategories() {
   return res.json();
 }
 
-async function getPlugins() {
-  const res = await fetch(`${getUrl()}/api/plugin`);
-  // Recommendation: handle errors
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    throw new Error("Failed to fetch data");
-  }
-
-  return res.json();
-}
 
 export default async function Home() {
-  const [plugins, categories] = await Promise.all([
-    getPlugins(),
+  const [categories] = await Promise.all([
     getCategories(),
   ]);
-  if (plugins && categories) {
+  if (categories) {
     const colors = generateContrastingColors(categories.length);
     const categoryColorMap = {};
 
@@ -46,14 +35,6 @@ export default async function Home() {
       };
     });
 
-    const newPlugins = plugins.map((plugin, index) => {
-      const categoryName = plugin.metadata.category.toUpperCase();
-      return {
-        ...plugin,
-        color: categoryColorMap[categoryName],
-      };
-    });
-
     return (
       <div className="max-w-screen-md md:mx-auto md:pt-10">
         <div className="navbar bg-white shadow-md px-2 md:mb-3 md:rounded-lg dark:bg-slate-800">
@@ -63,7 +44,7 @@ export default async function Home() {
           </div>
         </div>
         <Filters categories={newCategories} />
-        <PluginList plugins={newPlugins} />
+        <PluginList categoryColorMap={categoryColorMap} />
       </div>
     );
   }
