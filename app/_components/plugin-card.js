@@ -1,8 +1,9 @@
 "use client";
+import { useState } from "react";
 import { useCategory } from "../_context/category-context";
 import { getUrl } from "../../utils/url";
 import ImageWithFallback from "./image-fallback";
-import useSWR, { useSWRConfig } from 'swr'
+import { useSWRConfig } from "swr";
 
 const PluginCard = ({
   id,
@@ -13,9 +14,11 @@ const PluginCard = ({
   category,
   color,
   rating,
+  user,
 }) => {
-  const { mutate } = useSWRConfig()
+  const { mutate } = useSWRConfig();
   const [selectedCategory, setSelectedCategory] = useCategory();
+  const [isLoading, setIsLoading] = useState(false);
 
   async function postData(url = "", data = {}) {
     try {
@@ -41,28 +44,35 @@ const PluginCard = ({
 
   const updateFn = (newPluginList) => {
     // console.log(newPluginList)
-  }
+  };
 
   const handleClick = async (vote) => {
-    const data = JSON.stringify({
-      pluginId: id,
-      userId: "123",
-      vote: vote,
-    });
+    setIsLoading(true);
+    try {
+      const data = JSON.stringify({
+        pluginId: id,
+        userId: user.uid,
+        vote: vote,
+      });
 
-    const url = `${getUrl()}/api/rating`;
-    const result = await postData(url, data);
+      const url = `${getUrl()}/api/rating`;
+      const result = await postData(url, data);
 
-    // TODO: can do optimistic update if needed
-    const newPluginList = []
+      // TODO: can do optimistic update if needed
+      const newPluginList = [];
 
-    const options = {
-      optimisticData: newPluginList,
-      rollbackOnError: true,
+      const options = {
+        optimisticData: newPluginList,
+        rollbackOnError: true,
+      };
+
+      // TODO: update the UI to reflect the vote
+      mutate("/api/plugin", updateFn(newPluginList), options);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-
-    // TODO: update the UI to reflect the vote
-    mutate('/api/plugin', updateFn(newPluginList), options)
   };
 
   if (selectedCategory) {

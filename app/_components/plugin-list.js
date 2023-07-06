@@ -1,8 +1,21 @@
 "use client";
+import { initializeApp } from "firebase/app";
+import { getAuth, signInAnonymously } from "firebase/auth";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import PluginCard from "./plugin-card";
 import { getUrl } from "../../utils/url";
 import SkeletonPluginCard from "./skeleton-plugin-card";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+};
 
 // A component for the list of plugins
 async function getPlugins() {
@@ -29,6 +42,31 @@ const SkeletonPluginCardList = () => {
 };
 
 const PluginList = ({ categoryColorMap }) => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => { 
+    const getAnonymous = () => {
+      initializeApp(firebaseConfig);
+      const auth = getAuth();
+    
+      signInAnonymously(auth)
+        .then((userCredential) => {
+          // Signed in...
+          var user = userCredential.user;
+          setUser(user);
+        })
+        .catch((error) => {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+    
+          console.log(errorCode, errorMessage);
+          // Handle the error or display an error message to the user.
+        });
+    };
+
+    getAnonymous();
+  }, []);
+
   const { data: plugins, error } = useSWR("/api/plugin", getPlugins);
 
   if (error) {
@@ -62,6 +100,7 @@ const PluginList = ({ categoryColorMap }) => {
           category={plugin.metadata.category}
           color={plugin.color}
           rating={plugin.rating}
+          user={user}
         />
       ))}
     </div>
